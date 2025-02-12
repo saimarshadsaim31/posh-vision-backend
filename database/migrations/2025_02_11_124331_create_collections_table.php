@@ -24,6 +24,7 @@ return new class extends Migration
             $table->text('shopify_collection_id')->nullable();
             $table->longText('image')->nullable();
             $table->longText('description')->nullable();
+            $table->enum('status', ['approved', 'pending', 'rejected'])->default('pending');
             $table->string('shopify_publication_status');
         });
     }
