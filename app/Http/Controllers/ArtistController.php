@@ -6,9 +6,11 @@ use App\Actions\Fortify\CreateNewUser;
 use App\Actions\Fortify\UpdateUserPassword;
 use App\Actions\Fortify\UpdateUserProfileInformation;
 use App\Http\Resources\UserResource;
+use App\Models\Collection;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 
 class ArtistController extends Controller
 {
@@ -85,6 +87,24 @@ class ArtistController extends Controller
             return new JsonResponse([
                 "message" => "Artist access successfully updated"
             ], 200);
+        }
+        return new JsonResponse([], 400);
+    }
+    public function handleStatus(User $artist, Request $request)
+    {
+        Validator::make($request->all(), [
+            'status' => 'required|in:rejected,approved,pending',
+        ])->validate();
+        if($artist->role === 'artist') {
+            $collection = Collection::where('user_id', $artist->id)->first();
+            if($collection) {
+                $collection->update([
+                    "status" => $request->input('status'),
+                ]);
+                return new JsonResponse([
+                    "message" => "Artist profile status successfully updated",
+                ], 200);
+            }
         }
         return new JsonResponse([], 400);
     }

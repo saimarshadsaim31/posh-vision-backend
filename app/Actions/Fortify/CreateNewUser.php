@@ -21,6 +21,11 @@ class CreateNewUser implements CreatesNewUsers
     public function create(array $input): User
     {
         Validator::make($input, [
+            'phone_number' => ['string', 'max:255'],
+            'country' => ['string', 'max:255'],
+            'state' => ['string', 'max:255'],
+            'city' => ['string', 'max:255'],
+            'zip_code' => ['string', 'max:255'],
             'first_name' => ['required', 'string', 'max:255'],
             'last_name' => ['required', 'string', 'max:255'],
             'email' => [
@@ -42,6 +47,12 @@ class CreateNewUser implements CreatesNewUsers
             'role' => 'artist',
             'email' => $input['email'],
             'password' => Hash::make($input['password']),
+            'phone_number' => @$input['phone_number'],
+            'address' => @$input['address'],
+            'city' => @$input['city'],
+            'state' => @$input['state'],
+            'country' => @$input['country'],
+            'zip_code' => @$input['zip_code'],
         ]);
 
         Collection::create([

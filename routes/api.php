@@ -26,6 +26,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::resource('artist', ArtistController::class);
         Route::put('/artist/update-password/{artist}', [ArtistController::class, 'updatePassword']);
         Route::put('/artist/handle-access/{artist}', [ArtistController::class, 'handleAccess']);
+        Route::put('/artist/handle-status/{artist}', [ArtistController::class, 'handleStatus']);
     });
 });
 

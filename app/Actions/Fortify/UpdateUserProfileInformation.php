@@ -19,6 +19,11 @@ class UpdateUserProfileInformation implements UpdatesUserProfileInformation
     public function update(User $user, array $input): void
     {
         Validator::make($input, [
+            'phone_number' => ['string', 'max:255'],
+            'country' => ['string', 'max:255'],
+            'state' => ['string', 'max:255'],
+            'city' => ['string', 'max:255'],
+            'zip_code' => ['string', 'max:255'],
             'first_name' => ['required', 'string', 'max:255'],
             'last_name' => ['required', 'string', 'max:255'],
             'email' => [
@@ -62,6 +67,12 @@ class UpdateUserProfileInformation implements UpdatesUserProfileInformation
                 'first_name' => $input['first_name'],
                 'last_name' => $input['last_name'],
                 'email' => $input['email'],
+                'phone_number' => @$input['phone_number'],
+            'address' => @$input['address'],
+            'city' => @$input['city'],
+            'state' => @$input['state'],
+            'country' => @$input['country'],
+            'zip_code' => @$input['zip_code'],
             ])->save();
         }
     }
@@ -78,6 +89,12 @@ class UpdateUserProfileInformation implements UpdatesUserProfileInformation
             'last_name' => $input['last_name'],
             'email' => $input['email'],
             'email_verified_at' => null,
+            'phone_number' => @$input['phone_number'],
+            'address' => @$input['address'],
+            'city' => @$input['city'],
+            'state' => @$input['state'],
+            'country' => @$input['country'],
+            'zip_code' => @$input['zip_code'],
         ])->save();
 
         if($user->role === 'artist') {
