@@ -1,6 +1,5 @@
 <?php
 
-use App\Http\Controllers\Auth\ConfirmablePasswordController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\NewPasswordController;
 use App\Http\Controllers\Auth\PasswordController;
@@ -20,8 +19,8 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('/storage/file/get-s3-signed-url', [FileController::class, 'generateSignedUrl']);
 
     Route::put('/auth/user/password', [PasswordController::class, 'update']);
-    Route::put('/auth/user/confirm-password', [ConfirmablePasswordController::class, 'store']);
     Route::put('/auth/user/profile-information', [ProfileInformationController::class, 'update']);
+    Route::get('/auth/user/profile-information', [ProfileInformationController::class, 'show']);
 });
 
 

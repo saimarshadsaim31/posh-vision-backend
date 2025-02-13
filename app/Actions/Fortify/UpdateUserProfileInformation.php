@@ -2,6 +2,7 @@
 
 namespace App\Actions\Fortify;
 
+use App\Models\Collection;
 use App\Models\User;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Support\Facades\Validator;
@@ -18,8 +19,8 @@ class UpdateUserProfileInformation implements UpdatesUserProfileInformation
     public function update(User $user, array $input): void
     {
         Validator::make($input, [
-            'name' => ['required', 'string', 'max:255'],
-
+            'first_name' => ['required', 'string', 'max:255'],
+            'last_name' => ['required', 'string', 'max:255'],
             'email' => [
                 'required',
                 'string',
@@ -27,14 +28,39 @@ class UpdateUserProfileInformation implements UpdatesUserProfileInformation
                 'max:255',
                 Rule::unique('users')->ignore($user->id),
             ],
+            'image' => ['required', 'url'],
+            'title' => ['required', 'string', 'max:255'],
+            'description' => ['required'],
         ])->validateWithBag('updateProfileInformation');
 
         if ($input['email'] !== $user->email &&
             $user instanceof MustVerifyEmail) {
             $this->updateVerifiedUser($user, $input);
         } else {
+            if($user->role === 'artist') {
+                $collection = Collection::find($user->id);
+
+                if($collection) {
+                    $collection->update([
+                        'title' => $input['title'],
+                        'image' => $input['image'],
+                        'description' => $input['description'],
+                        'shopify_publication_status' => 'draft',
+                    ]);
+                } else {
+                    Collection::create([
+                        'user_id' => $user->id,
+                        'title' => $input['title'],
+                        'image' => $input['image'],
+                        'description' => $input['description'],
+                        'shopify_publication_status' => 'draft',
+                    ]);
+                }
+            }
+
             $user->forceFill([
-                'name' => $input['name'],
+                'first_name' => $input['first_name'],
+                'last_name' => $input['last_name'],
                 'email' => $input['email'],
             ])->save();
         }
