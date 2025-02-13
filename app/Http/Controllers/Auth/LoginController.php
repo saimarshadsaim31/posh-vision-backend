@@ -15,7 +15,7 @@ class LoginController extends AuthenticatedSessionController
     {
         return $this->loginPipeline($request)->then(function ($request) {
             $user = Auth::user();
-            $token = $user->createToken('auth_token')->plainTextToken;
+            $token = $user->createToken('auth_token', ['role:'.$user->role])->plainTextToken;
 
             return new LoginResource([
                 'token' => $token,

@@ -21,6 +21,7 @@ class UserResource extends JsonResource
             'last_name' => $this->last_name,
             'email' => $this->email,
             'role' => $this->role,
+            'blocked' => $this->blocked,
             'email_verified_at' => $this->email_verified_at,
             'collections' => CollectionResource::collection($this->collections ?? []),
             'created_at' => $this->created_at,

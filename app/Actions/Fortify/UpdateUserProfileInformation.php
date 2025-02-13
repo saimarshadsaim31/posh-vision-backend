@@ -38,7 +38,7 @@ class UpdateUserProfileInformation implements UpdatesUserProfileInformation
             $this->updateVerifiedUser($user, $input);
         } else {
             if($user->role === 'artist') {
-                $collection = Collection::find($user->id);
+                $collection = Collection::where('user_id', $user->id)->first();
 
                 if($collection) {
                     $collection->update([
@@ -74,10 +74,32 @@ class UpdateUserProfileInformation implements UpdatesUserProfileInformation
     protected function updateVerifiedUser(User $user, array $input): void
     {
         $user->forceFill([
-            'name' => $input['name'],
+            'first_name' => $input['first_name'],
+            'last_name' => $input['last_name'],
             'email' => $input['email'],
             'email_verified_at' => null,
         ])->save();
+
+        if($user->role === 'artist') {
+            $collection = Collection::where('user_id', $user->id)->first();
+
+            if($collection) {
+                $collection->update([
+                    'title' => $input['title'],
+                    'image' => $input['image'],
+                    'description' => $input['description'],
+                    'shopify_publication_status' => 'draft',
+                ]);
+            } else {
+                Collection::create([
+                    'user_id' => $user->id,
+                    'title' => $input['title'],
+                    'image' => $input['image'],
+                    'description' => $input['description'],
+                    'shopify_publication_status' => 'draft',
+                ]);
+            }
+        }
 
         $user->sendEmailVerificationNotification();
     }

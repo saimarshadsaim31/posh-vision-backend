@@ -11,7 +11,7 @@ class RegisterResponse implements RegisterResponseContract
     public function toResponse($request)
     {
         $user = Auth::user();
-        $token = $user->createToken('auth_token')->plainTextToken;
+        $token = $user->createToken('auth_token', ['role:'.$user->role])->plainTextToken;
 
 
         return new LoginResource([
