@@ -8,6 +8,7 @@ use App\Actions\Fortify\UpdateUserProfileInformation;
 use App\Http\Resources\UserResource;
 use App\Models\Collection;
 use App\Models\User;
+use App\ShopifyAdminApi;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -31,11 +32,24 @@ class ArtistController extends Controller
     }
     public function store(Request $request, CreateNewUser $creater)
     {
-        $user = $creater->create($request->all());
-        return new JsonResponse([
-            "message" => "Artist successfully created",
-            "user" => new UserResource($user),
-        ], 200);
+        return ShopifyAdminApi::productVariantCreate(8071429914815, [
+            [
+                'price' => 10
+            ]
+        ]);
+        //return ShopifyAdminApi::showProductVariantList(8071429914815);
+        // return ShopifyAdminApi::createProduct([
+        //     'title' => "Hello world",
+        //     'description' => "this is dummy product",
+        //     "images" => ["https://cdn-front.freepik.com/images/ai/image-generator/gallery/65446.webp", "https://cdn-front.freepik.com/images/ai/image-generator/gallery/65446.webp", "https://cdn-front.freepik.com/images/ai/image-generator/gallery/65446.webp"]
+        // ], "gid://shopify/Collection/339293110463");
+        //$user = $creater->create($request->all());
+        //return ShopifyAdminApi::deleteCollection('gid://shopify/Collection/339291472063');
+        //return ShopifyAdminApi::createCollection($request->all());
+        // return new JsonResponse([
+        //     "message" => "Artist successfully created",
+        //     "user" => new UserResource($user),
+        // ], 200);
     }
     public function update(Request $request, User $artist, UpdateUserProfileInformation $updater)
     {
