@@ -14,7 +14,7 @@ Route::post('/auth/login', [LoginController::class, 'store']);
 Route::post('/auth/register', [RegisterController::class, 'store']);
 Route::post('/auth/forgot-password', [PasswordResetLinkController::class, 'store']);
 Route::post('/auth/reset-password', [NewPasswordController::class, 'store']);
-Route::get('/storage/file/get-s3-signed-url', [FileController::class, 'generateSignedUrl']);
+Route::post('/storage/file/get-s3-signed-url', [FileController::class, 'generateSignedUrl']);
 
 Route::middleware(['auth:sanctum'])->group(function () {
     Route::put('/auth/user/password', [PasswordController::class, 'update']);
