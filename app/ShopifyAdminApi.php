@@ -270,6 +270,14 @@ class ShopifyAdminApi
                                     status
                                 }
                             }
+                        },
+                        variants(first: 1) {
+                            nodes {
+                                id
+                                inventoryPolicy
+                                inventoryQuantity
+                                price
+                            }
                         }
                     }
                     userErrors {
@@ -287,6 +295,11 @@ class ShopifyAdminApi
                 "status" => env('SHOPIFY_MODE') == 'development' ? 'DRAFT' : 'ACTIVE',
                 "collectionsToJoin" => [$collectionId],
             ],
+            "variants" => [
+                [
+                    "price" => "19.99"
+                ]
+            ]
         ];
 
         if(@$request['images']) {
@@ -370,6 +383,11 @@ class ShopifyAdminApi
                     productVariants {
                         id
                         price
+                        title
+                        selectedOptions {
+                            name
+                            value
+                        }
                     }
                     userErrors {
                         field
