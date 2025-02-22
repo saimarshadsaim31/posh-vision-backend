@@ -29,6 +29,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
     Route::middleware(['ability:role:superadmin,role:admin,role:user'])->group(function () {
         Route::resource('artist', ArtistController::class);
+        Route::get('/artist/products/{artist}', [ArtistController::class, 'collectionProduct']);
         Route::put('/artist/update-password/{artist}', [ArtistController::class, 'updatePassword']);
         Route::put('/artist/handle-access/{artist}', [ArtistController::class, 'handleAccess']);
         Route::put('/artist/handle-status/{artist}', [ArtistController::class, 'handleStatus']);

@@ -5,8 +5,10 @@ namespace App\Http\Controllers;
 use App\Actions\Fortify\CreateNewUser;
 use App\Actions\Fortify\UpdateUserPassword;
 use App\Actions\Fortify\UpdateUserProfileInformation;
+use App\Http\Resources\ProductResource;
 use App\Http\Resources\UserResource;
 use App\Models\Collection;
+use App\Models\Product;
 use App\Models\User;
 use App\ShopifyAdminApi;
 use Illuminate\Http\JsonResponse;
@@ -122,6 +124,27 @@ class ArtistController extends Controller
                     "message" => "Artist profile status successfully updated",
                 ], 200);
             }
+        }
+        return new JsonResponse([], 400);
+    }
+    public function collectionProduct(User $artist, Request $request)
+    {
+        if($artist->role === 'artist') {
+            $perPage = $request->input('per_page', 20);
+            $products = Product::whereHas('collection', function ($query) use ($artist) {
+                $query->where('user_id', $artist->id);
+            })
+            ->paginate($perPage);
+            return ProductResource::collection($products)
+            ->additional([
+                'meta' => [
+                    'total' => $products->total(),
+                    'current_page' => $products->currentPage(),
+                    'per_page' => $products->perPage(),
+                    'last_page' => $products->lastPage(),
+                    'total_pages' => $products->lastPage(),
+                ]
+            ]);
         }
         return new JsonResponse([], 400);
     }
