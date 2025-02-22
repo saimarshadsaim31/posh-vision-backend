@@ -18,28 +18,42 @@ class UpdateUserProfileInformation implements UpdatesUserProfileInformation
      */
     public function update(User $user, array $input): void
     {
-        Validator::make($input, [
-            'phone_number' => ['string', 'max:255'],
-            'country' => ['string', 'max:255'],
-            'state' => ['string', 'max:255'],
-            'city' => ['string', 'max:255'],
-            'zip_code' => ['string', 'max:255'],
-            'first_name' => ['required', 'string', 'max:255'],
-            'last_name' => ['required', 'string', 'max:255'],
-            'email' => [
-                'required',
-                'string',
-                'email',
-                'max:255',
-                Rule::unique('users')->ignore($user->id),
-            ],
-            'image' => ['required', 'url'],
-            'title' => ['required', 'string', 'max:255'],
-            'description' => ['required'],
-        ])->validateWithBag('updateProfileInformation');
-
+        if ($user->role === 'artist') {
+            Validator::make($input, [
+                'phone_number' => ['string', 'max:255'],
+                'country' => ['string', 'max:255'],
+                'state' => ['string', 'max:255'],
+                'city' => ['string', 'max:255'],
+                'zip_code' => ['string', 'max:255'],
+                'first_name' => ['required', 'string', 'max:255'],
+                'last_name' => ['required', 'string', 'max:255'],
+                'email' => [
+                    'required',
+                    'string',
+                    'email',
+                    'max:255',
+                    Rule::unique('users')->ignore($user->id),
+                ],
+                'image' => ['required', 'url'],
+                'title' => ['required', 'string', 'max:255'],
+                'description' => ['required'],
+            ])->validateWithBag('updateProfileInformation');
+        } else {
+            Validator::make($input, [
+                'first_name' => ['required', 'string', 'max:255'],
+                'last_name' => ['required', 'string', 'max:255'],
+                'email' => [
+                    'required',
+                    'string',
+                    'email',
+                    'max:255',
+                    Rule::unique('users')->ignore($user->id),
+                ],
+            ])->validateWithBag('updateProfileInformation');
+        }
+        $verified = $user;
         if ($input['email'] !== $user->email &&
-            $user instanceof MustVerifyEmail) {
+            $verified instanceof MustVerifyEmail) {
             $this->updateVerifiedUser($user, $input);
         } else {
             if($user->role === 'artist') {

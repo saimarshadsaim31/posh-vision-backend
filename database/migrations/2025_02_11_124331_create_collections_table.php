@@ -22,10 +22,11 @@ return new class extends Migration
             ->onDelete('cascade');
             $table->text('title');
             $table->text('shopify_collection_id')->nullable();
+            $table->text('shopify_collection_link')->nullable();
             $table->longText('image')->nullable();
             $table->longText('description')->nullable();
             $table->enum('status', ['approved', 'pending', 'rejected'])->default('pending');
-            $table->string('shopify_publication_status');
+            $table->string('shopify_publication_status')->default('draft');
         });
     }
 

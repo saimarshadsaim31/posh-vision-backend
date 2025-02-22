@@ -21,11 +21,6 @@ class CreateNewUser implements CreatesNewUsers
     public function create(array $input): User
     {
         Validator::make($input, [
-            'phone_number' => ['string', 'max:255'],
-            'country' => ['string', 'max:255'],
-            'state' => ['string', 'max:255'],
-            'city' => ['string', 'max:255'],
-            'zip_code' => ['string', 'max:255'],
             'first_name' => ['required', 'string', 'max:255'],
             'last_name' => ['required', 'string', 'max:255'],
             'email' => [
@@ -36,9 +31,6 @@ class CreateNewUser implements CreatesNewUsers
                 Rule::unique(User::class),
             ],
             'password' => $this->passwordRules(),
-            'image' => ['required', 'url'],
-            'title' => ['required', 'string', 'max:255'],
-            'description' => ['required'],
         ])->validate();
 
         $user = User::create([
@@ -57,11 +49,13 @@ class CreateNewUser implements CreatesNewUsers
 
         Collection::create([
             'user_id' => $user->id,
-            'title' => $input['title'],
+            'title' => $input['title'] ?? $input['first_name'] . ' ' . $input['last_name'],
             'image' => $input['image'],
             'description' => $input['description'],
             'shopify_publication_status' => 'draft',
         ]);
+
+
 
         return $user;
     }

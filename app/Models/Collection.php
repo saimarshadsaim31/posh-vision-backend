@@ -14,6 +14,7 @@ class Collection extends Model
         'user_id',
         'title',
         'shopify_collection_id',
+        'shopify_collection_link',
         'image',
         'description',
         'status',
@@ -23,5 +24,10 @@ class Collection extends Model
     public function user()
     {
         $this->belongsTo(Collection::class);
+    }
+
+    public function products()
+    {
+        $this->hasMany(Product::class);
     }
 }
