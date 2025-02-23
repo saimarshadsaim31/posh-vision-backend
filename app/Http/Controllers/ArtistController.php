@@ -20,7 +20,33 @@ class ArtistController extends Controller
     public function index(Request $request)
     {
         $perPage = $request->input('per_page', 20);
-        $artists = User::where('role', 'artist')->paginate($perPage);
+        $artists = User::where('role', 'artist')
+        ->where(function ($query) use ($request) {
+            if(!empty($request->get('status'))) {
+                $query->whereHas('collections', function ($q) use ($request) {
+                    $q->where('status', $request->get('status'));
+                });
+            }
+            if(!empty($request->get('search'))) {
+                $searchTerms = explode(" ", trim($request->get('search')));
+                foreach ($searchTerms as $term) {
+                    $query->where('first_name', 'ILIKE', '%'.$term.'%')
+                    ->orWhere('last_name', 'ILIKE', '%'.$term.'%')
+                    ->orWhere('email', 'ILIKE', '%'.$term.'%')
+                    ->orWhere('phone_number', 'ILIKE', '%'.$term.'%')
+                    ->orWhere('country', 'ILIKE', '%'.$term.'%')
+                    ->orWhere('city', 'ILIKE', '%'.$term.'%')
+                    ->orWhere('address', 'ILIKE', '%'.$term.'%')
+                    ->orWhere('zip_code', 'ILIKE', '%'.$term.'%')
+                    ->orWhere('state', 'ILIKE', '%'.$term.'%')
+                    ->orWhereHas('collections', function ($q) use ($term) {
+                        $q->where('title', 'ILIKE', '%'.$term.'%')
+                        ->orWhere('description', 'ILIKE', '%'.$term.'%');
+                    });
+                }
+            }
+        })
+        ->paginate($perPage);
         return UserResource::collection($artists)
             ->additional([
                 'meta' => [
@@ -133,6 +159,18 @@ class ArtistController extends Controller
             $perPage = $request->input('per_page', 20);
             $products = Product::whereHas('collection', function ($query) use ($artist) {
                 $query->where('user_id', $artist->id);
+            })
+            ->where(function ($query) use ($request) {
+                if(!empty($request->get('search'))) {
+                    $searchTerms = explode(" ", trim($request->get('search')));
+                    foreach ($searchTerms as $term) {
+                        $query->where('title', 'ILIKE', '%'.$term.'%')
+                        ->orWhere('description', 'ILIKE', '%'.$term.'%')
+                        ->orWhereHas('variants', function ($q) use ($term) {
+                            $q->where('price', 'LIKE', '%' . $term . '%');
+                        });
+                    }
+                }
             })
             ->paginate($perPage);
             return ProductResource::collection($products)

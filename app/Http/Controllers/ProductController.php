@@ -19,6 +19,18 @@ class ProductController extends Controller
         $products = Product::whereHas('collection', function ($query) {
             $query->where('user_id', Auth::user()->id);
         })
+        ->where(function ($query) use ($request) {
+            if(!empty($request->get('search'))) {
+                $searchTerms = explode(" ", trim($request->get('search')));
+                foreach ($searchTerms as $term) {
+                    $query->where('title', 'ILIKE', '%'.$term.'%')
+                    ->orWhere('description', 'ILIKE', '%'.$term.'%')
+                    ->orWhereHas('variants', function ($q) use ($term) {
+                        $q->where('price', 'LIKE', '%' . $term . '%');
+                    });
+                }
+            }
+        })
         ->paginate($perPage);
         return ProductResource::collection($products)
         ->additional([
@@ -90,6 +102,18 @@ class ProductController extends Controller
                 $query->where('user_id', Auth::user()->id);
             })
             ->where('collection_id', $collection->id)
+            ->where(function ($query) use ($request) {
+                if(!empty($request->get('search'))) {
+                    $searchTerms = explode(" ", trim($request->get('search')));
+                    foreach ($searchTerms as $term) {
+                        $query->where('title', 'ILIKE', '%'.$term.'%')
+                        ->orWhere('description', 'ILIKE', '%'.$term.'%')
+                        ->orWhereHas('variants', function ($q) use ($term) {
+                            $q->where('price', 'LIKE', '%' . $term . '%');
+                        });
+                    }
+                }
+            })
             ->paginate($perPage);
             return ProductResource::collection($products)
             ->additional([
