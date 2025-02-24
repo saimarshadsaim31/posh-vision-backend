@@ -20,6 +20,7 @@ return new class extends Migration
             ->references('id')
             ->on('products')
             ->onDelete('cascade');
+            $table->text('shopify_media_image_id')->nullable();
             $table->text('image')->nullable();
         });
     }

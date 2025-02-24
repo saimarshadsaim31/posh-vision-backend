@@ -4,9 +4,11 @@ namespace App\Actions\Fortify;
 
 use App\Models\Collection;
 use App\Models\User;
+use App\ShopifyAdminApi;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
+use Illuminate\Http\JsonResponse;
 use Laravel\Fortify\Contracts\UpdatesUserProfileInformation;
 
 class UpdateUserProfileInformation implements UpdatesUserProfileInformation
@@ -16,7 +18,7 @@ class UpdateUserProfileInformation implements UpdatesUserProfileInformation
      *
      * @param  array<string, string>  $input
      */
-    public function update(User $user, array $input): void
+    public function update(User $user, array $input)
     {
         if ($user->role === 'artist') {
             Validator::make($input, [
@@ -51,13 +53,26 @@ class UpdateUserProfileInformation implements UpdatesUserProfileInformation
                 ],
             ])->validateWithBag('updateProfileInformation');
         }
+        $collection = Collection::where('user_id', $user->id)->first();
+            if($collection->shopify_collection_id !== null && $collection->shopify_collection_id !== "" && $user->role === "artist") {
+                $shopifyResponse = ShopifyAdminApi::updateCollection([
+                    "title" => $collection->title,
+                    "description" => $collection->description,
+                    "image" => $collection->image
+                ],$collection->shopify_collection_id);
+                if ($shopifyResponse->status === "error") {
+                    return new JsonResponse([
+                        "message" => "An error occurred while changing collection status",
+                        "description" => $shopifyResponse->message
+                    ], 400);
+                }
+            }
         $verified = $user;
         if ($input['email'] !== $user->email &&
             $verified instanceof MustVerifyEmail) {
             $this->updateVerifiedUser($user, $input);
         } else {
             if($user->role === 'artist') {
-                $collection = Collection::where('user_id', $user->id)->first();
 
                 if($collection) {
                     $collection->update([

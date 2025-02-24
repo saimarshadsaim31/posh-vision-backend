@@ -18,8 +18,7 @@ class ProductImageResource extends JsonResource
             'id' => $this->id,
             'product_id' => $this->product_id,
             'image' => $this->image,
-            'created_at' => $this->created_at,
-            'updated_at' => $this->updated_at
+            'shopify_media_image_id' => $this->shopify_media_image_id,
         ];
     }
 }

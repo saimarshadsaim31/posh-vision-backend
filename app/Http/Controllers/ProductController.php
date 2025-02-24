@@ -7,6 +7,7 @@ use App\Actions\UpdateProductInformation;
 use App\Http\Resources\ProductResource;
 use App\Models\Collection;
 use App\Models\Product;
+use App\ShopifyAdminApi;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -45,11 +46,14 @@ class ProductController extends Controller
     }
     public function store(Request $request, CreateNewProduct $creater)
     {
-        $product = $creater->create($request->all());
-        return new JsonResponse([
-            "message" => "Product successfully created",
-            "product" => new ProductResource($product),
-        ], 200);
+        $response = $creater->create($request->all());
+        if(@$response->id) {
+            return new JsonResponse([
+                "message" => "Product successfully created",
+                "product" => new ProductResource($response),
+            ], 200);
+        }
+        return $response;
     }
     public function update(Request $request, Product $product, UpdateProductInformation $updater)
     {
@@ -58,11 +62,14 @@ class ProductController extends Controller
         })
         ->where('id', $product->id)
         ->exists()) {
-            $updater->update($product, $request->all());
-            return new JsonResponse([
-                "message" => "Product successfully updated",
-                "product" => new ProductResource($product),
-            ], 200);
+            $response = $updater->update($product, $request->all());
+            if(@$response->id) {
+                return new JsonResponse([
+                    "message" => "Product successfully updated",
+                    "product" => new ProductResource($product),
+                ], 200);
+            }
+            return $response;
         }
         return new JsonResponse([], 400);
     }
@@ -87,6 +94,13 @@ class ProductController extends Controller
         })
         ->where('id', $product->id)
         ->exists()) {
+            $shopifyResponse = ShopifyAdminApi::deleteProduct($product->shopify_product_id);
+            if($shopifyResponse->status === "error") {
+                return new JsonResponse([
+                    "message" => "An error occurred while creating product",
+                    "description" => $shopifyResponse->message
+                ], 400);
+            }
             $product->delete();
             return new JsonResponse([
                 "message" => "Product successfully deleted",
