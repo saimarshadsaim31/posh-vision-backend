@@ -120,6 +120,10 @@ class ArtistController extends Controller
     public function store(Request $request, CreateNewUser $creater)
     {
         $user = $creater->create($request->all());
+        if(in_array($request->input('status'), ['rejected', 'approved'])) {
+            $collection = Collection::where('user_id', $user->id)->first();
+            $this->collectionStatus($collection, $request);
+        }
         return new JsonResponse([
             "message" => "Artist successfully created",
             "user" => new UserResource($user),
