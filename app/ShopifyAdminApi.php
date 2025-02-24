@@ -494,7 +494,7 @@ class ShopifyAdminApi
     public static function deleteProduct($productId)
     {
         $query = <<<GRAPHQL
-            mutation {
+            mutation (\$productId: ID!) {
                 productDelete(input: {id: \$productId}) {
                     deletedProductId
                 }
