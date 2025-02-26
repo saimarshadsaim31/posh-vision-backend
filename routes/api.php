@@ -7,6 +7,7 @@ use App\Http\Controllers\Auth\PasswordController;
 use App\Http\Controllers\Auth\PasswordResetLinkController;
 use App\Http\Controllers\Auth\ProfileInformationController;
 use App\Http\Controllers\Auth\RegisterController;
+use App\Http\Controllers\ProductController;
 use App\Http\Controllers\Storage\FileController;
 use Illuminate\Support\Facades\Route;
 
@@ -21,8 +22,14 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::put('/auth/user/profile-information', [ProfileInformationController::class, 'update']);
     Route::get('/auth/user/profile-information', [ProfileInformationController::class, 'show']);
 
+    Route::middleware(['ability:role:artist'])->group(function () {
+        Route::resource('product', ProductController::class);
+        Route::get('/collection/products/{collection}', [ProductController::class, 'collectionProduct']);
+    });
+
     Route::middleware(['ability:role:superadmin,role:admin,role:user'])->group(function () {
         Route::resource('artist', ArtistController::class);
+        Route::get('/artist/products/{artist}', [ArtistController::class, 'collectionProduct']);
         Route::put('/artist/update-password/{artist}', [ArtistController::class, 'updatePassword']);
         Route::put('/artist/handle-access/{artist}', [ArtistController::class, 'handleAccess']);
         Route::put('/artist/handle-status/{artist}', [ArtistController::class, 'handleStatus']);

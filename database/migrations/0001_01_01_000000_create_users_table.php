@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('first_name');
             $table->string('last_name');
             $table->enum('role', ['superadmin', 'artist', 'admin', 'user']);
-            $table->string('email')->unique();
+            $table->string('email');
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->tinyInteger('blocked')->default(0);
@@ -29,6 +29,10 @@ return new class extends Migration
             $table->rememberToken();
             $table->timestamps();
             $table->softDeletes();
+        });
+
+        Schema::table('users', function (Blueprint $table) {
+            $table->unique('email');
         });
 
         Schema::create('password_reset_tokens', function (Blueprint $table) {
